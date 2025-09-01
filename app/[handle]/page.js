@@ -3,54 +3,57 @@ import clientPromise from "@/lib/mongodb"
 import { notFound } from "next/navigation";
 
 export default async function Page({ params }) {
-    const handle = (await params).handle
-    const client = await clientPromise;
-    const db = client.db("linknest")
-    const collection = db.collection("links")
+  const handle = (await params).handle
+  const client = await clientPromise;
+  const db = client.db("linknest")
+  const collection = db.collection("links")
 
-    // If the handle is already claimed, you cannot create the bittree
-    const item = await collection.findOne({handle: handle})
-    if(!item){
-        return notFound()
-    }
+  const item = await collection.findOne({ handle: handle })
+  if (!item) {
+    return notFound()
+  }
 
-    console.log(item)
-	
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-yellow-100 via-purple-200 to-purple-500">
+      <div className="relative max-w-md w-full bg-white/40 backdrop-blur-xl border border-yellow-200 shadow-2xl rounded-3xl p-8 flex flex-col items-center text-center space-y-6">
+        
+        {/* Decorative border effect */}
+        <div className="absolute inset-0 rounded-3xl border-2 border-yellow-300/60 pointer-events-none"></div>
 
-    const item2 = {
-        "_id": {
-            "$oid": "6729e97390cf30c8f66c4c68"
-        },
-        "links": [
-            {
-                "link": "https://www.instagram.com/codewithharry/?hl=en",
-                "linktext": "Instagram"
-            },
-            {
-                "link": "https://www.codewithharry.com",
-                "linktext": "Website"
-            },
-            {
-                "link": "https://www.YouTube.com/codewithharry/?hl=en",
-                "linktext": "YouTube"
-            }
-        ],
-        "handle": "harry",
-        "pic": "https://avatars.githubusercontent.com/u/48705673?v=4"
-    }
-    return <div className="flex min-h-screen bg-purple-400 justify-center items-start py-10">
-        {item && <div className="photo flex justify-center flex-col items-center gap-4"> 
-            <img src={item.pic} alt="" />
-            <span className="font-bold text-xl">@{item.handle}</span>
-            <span className="desc w-80 text-center">{item.desc}</span>
-            <div className="links">
-                {item.links.map((item, index)=>{
-                    return <Link  key={index} href= {item.link}><div className="bg-purple-100 py-4 shadow-lg px-2 min-w-96 flex justify-center rounded-md my-3">
-                       {item.linktext}
-                       
-                    </div></Link> 
-                })}
-            </div>
-      </div>}
+        {/* Profile Pic */}
+        <div className="relative">
+          <img
+            src={item.pic}
+            alt={item.handle}
+            className="w-32 h-32 object-cover rounded-full border-4 border-yellow-400 shadow-xl"
+          />
+          <div className="absolute inset-0 rounded-full border-2 border-purple-600/40 animate-pulse"></div>
+        </div>
+
+        {/* Handle + Desc */}
+        <div>
+          <h1 className="text-2xl font-extrabold text-purple-800 drop-shadow">@{item.handle}</h1>
+          <p className="mt-2 text-sm text-gray-800 italic">{item.desc || "No description provided."}</p>
+        </div>
+
+        <hr className="w-2/3 border-t-2 border-yellow-400/50 my-4" />
+
+        {/* Links */}
+        <div className="w-full space-y-4">
+          {item.links.map((linkItem, index) => (
+            <Link key={index} href={linkItem.link} target="_blank">
+              <div className="group bg-gradient-to-r from-purple-100 to-yellow-100 text-purple-900 font-semibold py-4 px-6 rounded-xl shadow-md hover:shadow-2xl hover:scale-105 transform transition duration-300 ease-in-out cursor-pointer">
+                <span className="group-hover:text-purple-700">{linkItem.linktext}</span>
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        {/* Footer Accent */}
+        <span className="text-xs text-gray-600 mt-4 italic">
+          ✨ Powered by LinkNest ✨
+        </span>
+      </div>
     </div>
+  )
 }
